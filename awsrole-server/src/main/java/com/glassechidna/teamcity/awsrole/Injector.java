@@ -22,18 +22,20 @@ public class Injector implements ParametersPreprocessor {
     private StsClient client;
 
     public Injector(PluginDescriptor descriptor, WebLinks webLinks) {
-        ClientOverrideConfiguration.Builder coc = ClientOverrideConfiguration.builder();
+        String userAgentSuffix = "plugin/" + descriptor.getPluginVersion();
 
         try {
             URI root = new URI(webLinks.getRootUrl());
-            String host = root.getHost();
-            coc.putAdvancedOption(SdkAdvancedClientOption.USER_AGENT_SUFFIX, "server/" + host);
+            userAgentSuffix += " server/" + root.getHost();
         } catch (URISyntaxException e) {
             // no-op
         }
 
-        coc.putAdvancedOption(SdkAdvancedClientOption.USER_AGENT_SUFFIX, "plugin/" + descriptor.getPluginVersion());
-        this.client = StsClient.builder().overrideConfiguration(coc.build()).build();
+        ClientOverrideConfiguration coc = ClientOverrideConfiguration
+                .builder()
+                .putAdvancedOption(SdkAdvancedClientOption.USER_AGENT_SUFFIX, userAgentSuffix)
+                .build();
+        this.client = StsClient.builder().overrideConfiguration(coc).build();
     }
 
     @Override
