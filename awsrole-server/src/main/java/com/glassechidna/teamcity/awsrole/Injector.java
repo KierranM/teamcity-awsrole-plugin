@@ -3,17 +3,38 @@ package com.glassechidna.teamcity.awsrole;
 import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.serverSide.ParametersPreprocessor;
 import jetbrains.buildServer.serverSide.SRunningBuild;
+import jetbrains.buildServer.serverSide.WebLinks;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.core.client.config.SdkAdvancedClientOption;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
 import software.amazon.awssdk.services.sts.model.AssumeRoleResponse;
 import software.amazon.awssdk.services.sts.model.Credentials;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 public class Injector implements ParametersPreprocessor {
     private static Logger LOG = jetbrains.buildServer.log.Loggers.SERVER;
-    private StsClient client = StsClient.create();
+    private StsClient client;
+
+    public Injector(PluginDescriptor descriptor, WebLinks webLinks) {
+        ClientOverrideConfiguration.Builder coc = ClientOverrideConfiguration.builder();
+
+        try {
+            URI root = new URI(webLinks.getRootUrl());
+            String host = root.getHost();
+            coc.putAdvancedOption(SdkAdvancedClientOption.USER_AGENT_SUFFIX, "server/" + host);
+        } catch (URISyntaxException e) {
+            // no-op
+        }
+
+        coc.putAdvancedOption(SdkAdvancedClientOption.USER_AGENT_SUFFIX, "plugin/" + descriptor.getPluginVersion());
+        this.client = StsClient.builder().overrideConfiguration(coc.build()).build();
+    }
 
     @Override
     public void fixRunBuildParameters(@NotNull SRunningBuild build, @NotNull Map<String, String> runParameters, @NotNull Map<String, String> buildParams) {
