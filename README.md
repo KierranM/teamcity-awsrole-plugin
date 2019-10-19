@@ -22,18 +22,56 @@ The TeamCity **server** should have an IAM role that has `sts:AssumeRole` permis
 to assume roles needed by build steps. Build configurations can define an `aws.roleArn`
 configuration parameter, e.g. `arn:aws:iam::1234567890:role/ApiDeployer`. 
 
-Whenever  a build with this configuration parameter is started, the **server** 
+Whenever a build with this configuration parameter is started, the **server** 
 assumes the requested role and sets `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
-and `AWS_SESSION_TOKEN` environment variables. 
+and `AWS_SESSION_TOKEN` environment variables for the build. 
 
 Crucially, it sets the role session name to `%system.teamcity.buildType.id%_%system.build.number%` 
-and the [external id][external-id] to `%system.teamcity.buildType.id%`. The former
+and the [external ID][external-id] to `%system.teamcity.buildType.id%`. The former
 means that CloudTrail logs will identify the build making API calls and the latter
 allows roles to be locked down to only allow specific projects to assume them.
 
 ## Download
 
 The compiled plugin ZIP can be downloaded from the [Releases][releases] tab.
+
+## Notes
+
+* An IAM role session name has a maximum length of 64 characters. TeamCity project
+  IDs can be up to 240 characters long. The role session name will be truncated
+  to 64 characters when passed to AWS.
+  
+* The `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN` values are automatically masked
+  by TeamCity in build logs and parameter listings for completed builds. The
+  `AWS_ACCESS_KEY_ID` value is not hidden as it can be useful for searches in
+  CloudTrail.
+  
+* You can specify wildcards in your IAM role trust policies. An example of such
+  a policy would be:
+  
+  ```json
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AssumeRoleFromTeamcity",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+          "StringLike": {
+            "sts:ExternalId": "MyTopLevelProject_TeamSpecific_*"
+          }
+        }
+      }
+    ]
+  }
+  ```
+  
+  This allows only subprojects and build configurations under `MyTopLevelProject_TeamSpecific`
+  to assume this role.
 
 [external-id]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html
 [releases]: https://github.com/glassechidna/teamcity-awsrole-plugin/releases
