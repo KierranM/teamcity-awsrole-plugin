@@ -1,9 +1,7 @@
 package com.glassechidna.teamcity.awsrole;
 
 import com.intellij.openapi.diagnostic.Logger;
-import jetbrains.buildServer.serverSide.ParametersPreprocessor;
-import jetbrains.buildServer.serverSide.SRunningBuild;
-import jetbrains.buildServer.serverSide.WebLinks;
+import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
@@ -15,6 +13,7 @@ import software.amazon.awssdk.services.sts.model.Credentials;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Map;
 
 public class Injector implements ParametersPreprocessor {
@@ -40,7 +39,13 @@ public class Injector implements ParametersPreprocessor {
 
     @Override
     public void fixRunBuildParameters(@NotNull SRunningBuild build, @NotNull Map<String, String> runParameters, @NotNull Map<String, String> buildParams) {
-        String roleArn = buildParams.getOrDefault("aws.roleArn", "");
+        Collection<SBuildFeatureDescriptor> features = build.getBuildFeaturesOfType(AwsRoleFeature.FEATURE_TYPE);
+        if (features.isEmpty()) {
+            return;
+        }
+
+        SBuildFeatureDescriptor feature = features.iterator().next();
+        String roleArn = feature.getParameters().getOrDefault(AwsRoleFeature.PARAMETER_NAME, "");
         if (roleArn == "") {
             return;
         }

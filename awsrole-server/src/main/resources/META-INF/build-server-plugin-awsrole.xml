@@ -5,4 +5,5 @@
        default-autowire="constructor">
 
     <bean id="injector" class="com.glassechidna.teamcity.awsrole.Injector" />
+    <bean id="feature" class="com.glassechidna.teamcity.awsrole.AwsRoleFeature" />
 </beans>
