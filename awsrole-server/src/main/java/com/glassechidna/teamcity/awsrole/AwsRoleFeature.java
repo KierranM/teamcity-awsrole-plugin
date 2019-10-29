@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class AwsRoleFeature extends BuildFeature {
     static String FEATURE_TYPE = "awsrole";
-    static String PARAMETER_NAME = "roleArn";
+    static String PARAMETER_NAME = "teamcityAwsRolePluginRoleArn";
 
     @NotNull
     @Override
