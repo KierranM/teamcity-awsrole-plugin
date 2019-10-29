@@ -26,7 +26,7 @@ configured like so:
 features {
     feature {
         type = "awsrole"
-        param("roleArn", "arn:aws:iam::123456789012:role/ApiDeployer")
+        param("teamcityAwsRolePluginRoleArn", "arn:aws:iam::123456789012:role/ApiDeployer")
     }
 }
 ```
