@@ -23,10 +23,13 @@ to assume roles needed by build steps. Build configurations add a build feature
 configured like so:
 
 ```kotlin
+params {
+    param("awsrole.roleArn", "arn:aws:iam::123456789012:role/ApiDeployer")
+}
+
 features {
     feature {
         type = "awsrole"
-        param("teamcityAwsRolePluginRoleArn", "arn:aws:iam::123456789012:role/ApiDeployer")
     }
 }
 ```
@@ -36,15 +39,30 @@ requested role and sets `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and
 `AWS_SESSION_TOKEN` environment variables for the build. 
 
 Crucially, it sets the role session name to `%system.teamcity.buildType.id%_%system.build.number%` 
-and the [external ID][external-id] to `%system.teamcity.buildType.id%`. The former
-means that CloudTrail logs will identify the build making API calls and the latter
-allows roles to be locked down to only allow specific projects to assume them.
+and the [external ID][external-id] to `%system.teamcity.buildType.id%` by default. 
+The former means that CloudTrail logs will identify the build making API calls 
+and the latter allows roles to be locked down to only allow specific projects 
+to assume them.
+
+**SECURITY NOTE**: The role session name and external ID naming scheme can be 
+overridden using the `awsrole.sessionName` and `awsrole.externalId` parameters
+respectively. To ensure that projects can not maliciously override these 
+parameters, you can [enforce parameters][tc-enforce] using TeamCity.
 
 ## Download
 
 The compiled plugin ZIP can be downloaded from the [Releases][releases] tab.
 
 ## Notes
+
+* You can specify role [session tags][session-tags] using additional optional
+  parameters of the form `param("awsrole.tags.projectId", "%teamcity.project.id%")`.
+  As per the linked AWS docs, this requires the assumed role's trust policy to
+  allow `sts:TagSession`.
+  
+* Both the default role session name and external ID naming schemes can be
+  overridden using parameters `awsrole.sessionName` and `awsrole.externalId`
+  respectively. 
 
 * An IAM role session name has a maximum length of 64 characters. TeamCity project
   IDs can be up to 240 characters long. The role session name will be truncated
@@ -74,6 +92,19 @@ The compiled plugin ZIP can be downloaded from the [Releases][releases] tab.
             "sts:ExternalId": "MyTopLevelProject_TeamSpecific_*"
           }
         }
+      },
+      {
+        "Sid": "AllowTagsToBePassed",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        },
+        "Action": "sts:TagSession",
+        "Condition": {
+          "StringLike": {
+            "aws:RequestTag/projectId": "*"
+          }
+        }
       }
     ]
   }
@@ -84,3 +115,5 @@ The compiled plugin ZIP can be downloaded from the [Releases][releases] tab.
 
 [external-id]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html
 [releases]: https://github.com/glassechidna/teamcity-awsrole-plugin/releases
+[session-tags]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_session-tags.html
+[tc-enforce]: https://www.jetbrains.com/help/teamcity/build-configuration-template.html#BuildConfigurationTemplate-Enforcingsettingsinheritedfromtemplate
