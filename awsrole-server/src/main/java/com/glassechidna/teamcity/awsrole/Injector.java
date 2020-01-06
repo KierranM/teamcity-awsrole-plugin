@@ -53,9 +53,14 @@ public class Injector implements ParametersPreprocessor {
         }
 
         Map<String, String> resolved = build.getValueResolver().resolve(buildParams);
+
         String roleArn = resolved.getOrDefault(AwsRoleFeature.PARAMETER_NAME, "");
         if (roleArn == "") {
-            return;
+            // fall back to checking legacy parameter name
+            roleArn = resolved.getOrDefault("teamcityAwsRolePluginRoleArn", "");
+            if (roleArn == "") {
+                return;
+            }
         }
 
         String buildTypeId = resolved.get("system.teamcity.buildType.id");
