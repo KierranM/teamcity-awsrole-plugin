@@ -47,41 +47,18 @@ public class Injector implements ParametersPreprocessor {
 
     @Override
     public void fixRunBuildParameters(@NotNull SRunningBuild build, @NotNull Map<String, String> runParameters, @NotNull Map<String, String> buildParams) {
-        Collection<SBuildFeatureDescriptor> features = build.getBuildFeaturesOfType(AwsRoleFeature.FEATURE_TYPE);
+        Collection<SBuildFeatureDescriptor> features = build.getBuildFeaturesOfType(AwsRoleConstants.FEATURE_TYPE);
         if (features.isEmpty()) {
             return;
         }
 
         Map<String, String> resolved = build.getValueResolver().resolve(buildParams);
 
-        String roleArn = resolved.getOrDefault(AwsRoleFeature.PARAMETER_NAME, "");
-        if (roleArn == "") {
-            // fall back to checking legacy parameter name
-            roleArn = resolved.getOrDefault("teamcityAwsRolePluginRoleArn", "");
-            if (roleArn == "") {
-                return;
-            }
-        }
+        String roleArn = AwsRoleUtil.getRoleArn(resolved);
+        String externalId = AwsRoleUtil.getExternalId(resolved);
+        String sessionName = AwsRoleUtil.getSessionName(resolved);
 
-        String buildTypeId = resolved.get("system.teamcity.buildType.id");
-        String buildNumber = resolved.get("system.build.number");
-
-        String externalId = resolved.getOrDefault(AwsRoleFeature.PARAMETER_PREFIX + "externalId", "");
-        if (externalId == null || externalId.length() == 0) {
-            externalId = buildTypeId;
-        }
-
-        String sessionName = resolved.getOrDefault(AwsRoleFeature.PARAMETER_PREFIX + "sessionName", "");
-        if (sessionName == null || sessionName.length() == 0) {
-            sessionName = String.format("%s_%s", buildTypeId, buildNumber);
-        }
-
-        int maximumSessionNameLength = 64;
-        if (sessionName.length() > maximumSessionNameLength) {
-            sessionName = sessionName.substring(sessionName.length() - maximumSessionNameLength);
-        }
-
-        List<Tag> tags = collectSessionTags(resolved);
+        List<Tag> tags = AwsRoleUtil.getSessionTags(resolved);
 
         AssumeRoleRequest request = AssumeRoleRequest.builder()
                 .roleArn(roleArn)
@@ -95,24 +72,10 @@ public class Injector implements ParametersPreprocessor {
         putEnvironmentVariables(buildParams, assumeRoleResponse.credentials(), tags);
     }
 
-    @NotNull
-    private List<Tag> collectSessionTags(Map<String, String> resolved) {
-        List<Tag> tags = new ArrayList<>();
-
-        for (Map.Entry<String, String> entry : resolved.entrySet()) {
-            if (entry.getKey().startsWith(AwsRoleFeature.PARAMETER_TAGS_PREFIX)) {
-               String name = entry.getKey().replaceFirst(AwsRoleFeature.PARAMETER_TAGS_PREFIX, "");
-               String value = entry.getValue();
-               tags.add(Tag.builder().key(name).value(value).build());
-            }
-        }
-        return tags;
-    }
-
     private void putEnvironmentVariables(@NotNull Map<String, String> buildParams, Credentials c, List<Tag> tags) {
-        buildParams.put("env.AWS_ACCESS_KEY_ID", c.accessKeyId());
-        buildParams.put("env.AWS_SECRET_ACCESS_KEY", c.secretAccessKey());
-        buildParams.put("env.AWS_SESSION_TOKEN", c.sessionToken());
+        buildParams.put(AwsRoleConstants.AGENT_ACCESS_KEY_ID_PARAMETER, c.accessKeyId());
+        buildParams.put(AwsRoleConstants.AGENT_SECRET_ACCESS_KEY_PARAMETER, c.secretAccessKey());
+        buildParams.put(AwsRoleConstants.AGENT_SESSION_TOKEN_PARAMETER, c.sessionToken());
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -121,7 +84,7 @@ public class Injector implements ParametersPreprocessor {
                 tagMap.put(tag.key(), tag.value());
             }
             String tagJson = mapper.writeValueAsString(tagMap);
-            buildParams.put("env.AWSROLE_TAGS", tagJson);
+            buildParams.put(AwsRoleConstants.AGENT_ROLE_TAGS_PARAMETER, tagJson);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
