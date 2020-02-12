@@ -17,4 +17,6 @@ public class AwsRoleConstants {
     public static final String AGENT_ROLE_TAGS_PARAMETER = "env.AWSROLE_TAGS";
 
     public static final Integer MAXIMUM_ROLE_SESSION_NAME_LENGTH = 64;
+    public static final String DEFAULT_EXTERNAL_ID = "%system.teamcity.buildType.id%";
+    public static final String DEFAULT_SESSION_NAME = String.format("%s_%s", DEFAULT_EXTERNAL_ID, "%system.build.number%");
 }

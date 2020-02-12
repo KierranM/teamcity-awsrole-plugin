@@ -8,8 +8,12 @@ import jetbrains.buildServer.serverSide.WebLinks;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.services.sts.model.Tag;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AwsRoleFeature extends BuildFeature {
     private static Logger LOG = jetbrains.buildServer.log.Loggers.SERVER;
@@ -50,7 +54,41 @@ public class AwsRoleFeature extends BuildFeature {
         };
     }
 
+    @NotNull
+    @Override
+    public String describeParameters(@NotNull Map<String, String> params) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("Role ARN: %s\n", AwsRoleUtil.getRoleArn(params)));
+        builder.append(String.format("External Id: %s\n", AwsRoleUtil.getExternalId(params)));
+        builder.append(String.format("Session Name: %s\n", AwsRoleUtil.getSessionName(params)));
+
+        List<Tag> tags = AwsRoleUtil.getSessionTags(params);
+
+        if (tags.size() > 0) {
+            builder.append("Session Tags:\n");
+            for (Tag tag : tags) {
+                builder.append(String.format("%s => %s\n", tag.key(), tag.value()));
+            }
+        }
+
+        return builder.toString();
+    }
+
+    @Nullable
+    @Override
+    public Map<String, String> getDefaultParameters() {
+        Map<String, String> defaults = new HashMap<>();
+        defaults.put(AwsRoleConstants.EXTERNAL_ID_PARAMETER, AwsRoleConstants.DEFAULT_EXTERNAL_ID);
+        defaults.put(AwsRoleConstants.SESSION_NAME_PARAMETER, AwsRoleConstants.DEFAULT_SESSION_NAME);
+        return defaults;
+    }
+
     @Nullable
     @Override
     public String getEditParametersUrl() { return myEditUrl; }
+
+    @Override
+    public boolean isMultipleFeaturesPerBuildTypeAllowed() {
+        return false;
+    }
 }

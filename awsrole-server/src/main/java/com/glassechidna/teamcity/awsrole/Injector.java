@@ -52,24 +52,26 @@ public class Injector implements ParametersPreprocessor {
             return;
         }
 
-        Map<String, String> resolved = build.getValueResolver().resolve(buildParams);
+        for (SBuildFeatureDescriptor feature : features) {
+            Map<String, String> resolved = build.getValueResolver().resolve(feature.getParameters());
 
-        String roleArn = AwsRoleUtil.getRoleArn(resolved);
-        String externalId = AwsRoleUtil.getExternalId(resolved);
-        String sessionName = AwsRoleUtil.getSessionName(resolved);
+            String roleArn = AwsRoleUtil.getRoleArn(resolved);
+            String externalId = AwsRoleUtil.getExternalId(resolved);
+            String sessionName = AwsRoleUtil.getSessionName(resolved);
 
-        List<Tag> tags = AwsRoleUtil.getSessionTags(resolved);
+            List<Tag> tags = AwsRoleUtil.getSessionTags(resolved);
 
-        AssumeRoleRequest request = AssumeRoleRequest.builder()
-                .roleArn(roleArn)
-                .roleSessionName(sessionName)
-                .externalId(externalId)
-                .tags(tags)
-                .build();
+            AssumeRoleRequest request = AssumeRoleRequest.builder()
+                    .roleArn(roleArn)
+                    .roleSessionName(sessionName)
+                    .externalId(externalId)
+                    .tags(tags)
+                    .build();
 
-        LOG.warn("Assuming AWS IAM role for build: " + request);
-        AssumeRoleResponse assumeRoleResponse = client.assumeRole(request);
-        putEnvironmentVariables(buildParams, assumeRoleResponse.credentials(), tags);
+            LOG.warn("Assuming AWS IAM role for build: " + request);
+            AssumeRoleResponse assumeRoleResponse = client.assumeRole(request);
+            putEnvironmentVariables(buildParams, assumeRoleResponse.credentials(), tags);
+        }
     }
 
     private void putEnvironmentVariables(@NotNull Map<String, String> buildParams, Credentials c, List<Tag> tags) {

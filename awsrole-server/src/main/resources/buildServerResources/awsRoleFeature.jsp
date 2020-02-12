@@ -27,7 +27,6 @@
     </th>
     <td>
         <props:textProperty name="<%=params.getExternalId()%>" className="longField"/>
-        <span class="smallNote">Leave empty to use the build type ID</span>
     </td>
 </tr>
 <tr>
@@ -36,7 +35,6 @@
     </th>
     <td>
         <props:textProperty name="<%=params.getSessionName()%>" className="longField"/>
-        <span class="smallNote">Leave empty to use the build type ID and build number</span>
     </td>
 </tr>
 <tr>
