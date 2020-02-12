@@ -23,7 +23,6 @@ to assume roles needed by build steps. Build configurations add a build feature
 configured like so:
 
 ```kotlin
-
 features {
     feature {
         type = "awsrole"
