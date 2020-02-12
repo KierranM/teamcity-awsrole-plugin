@@ -23,13 +23,15 @@ to assume roles needed by build steps. Build configurations add a build feature
 configured like so:
 
 ```kotlin
-params {
-    param("awsrole.roleArn", "arn:aws:iam::123456789012:role/ApiDeployer")
-}
 
 features {
     feature {
         type = "awsrole"
+        param("awsrole.roleArn", "arn:aws:iam::123456789012:role/ApiDeployer")
+        param("awsrole.sessionTags", """
+            teamcity.build.id=%teamcity.build.id%
+            teamcity.build.triggeredBy.username=%teamcity.build.triggeredBy.username%
+        """.trimIndent())
     }
 }
 ```
@@ -55,8 +57,8 @@ The compiled plugin ZIP can be downloaded from the [Releases][releases] tab.
 
 ## Notes
 
-* You can specify role [session tags][session-tags] using additional optional
-  parameters of the form `param("awsrole.tags.projectId", "%teamcity.project.id%")`.
+* You can specify role [session tags][session-tags] using the optional
+  parameters of the form `param("awsrole.sessionTags", "projectId=%teamcity.project.id%")`.
   As per the linked AWS docs, this requires the assumed role's trust policy to
   allow `sts:TagSession`.
   
