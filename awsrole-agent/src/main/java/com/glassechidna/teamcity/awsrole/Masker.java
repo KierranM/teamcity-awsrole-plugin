@@ -22,11 +22,11 @@ public class Masker extends AgentLifeCycleAdapter {
     public void buildStarted(@NotNull AgentRunningBuild runningBuild) {
         Map<String, String> params = runningBuild.getSharedBuildParameters().getAllParameters();
 
-        if (params.containsKey("env.AWS_SECRET_ACCESS_KEY")) {
-            String sak = params.get("env.AWS_SECRET_ACCESS_KEY");
+        if (params.containsKey(AwsRoleConstants.AGENT_SECRET_ACCESS_KEY_PARAMETER)) {
+            String sak = params.get(AwsRoleConstants.AGENT_SECRET_ACCESS_KEY_PARAMETER);
             runningBuild.getPasswordReplacer().addPassword(sak);
 
-            String tok = params.get("env.AWS_SESSION_TOKEN");
+            String tok = params.get(AwsRoleConstants.AGENT_SESSION_TOKEN_PARAMETER);
             runningBuild.getPasswordReplacer().addPassword(tok);
         }
     }
