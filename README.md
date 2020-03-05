@@ -23,14 +23,17 @@ to assume roles needed by build steps. Build configurations add a build feature
 configured like so:
 
 ```kotlin
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.awsAssumeRole
+
+// ...
+
 features {
-    feature {
-        type = "awsrole"
-        param("awsrole.roleArn", "arn:aws:iam::123456789012:role/ApiDeployer")
-        param("awsrole.sessionTags", """
+    awsAssumeRole {
+        roleArn = "arn:aws:iam::123456789012:role/ApiDeployer"
+        sessionTags = """
             teamcity.build.id=%teamcity.build.id%
             teamcity.build.triggeredBy.username=%teamcity.build.triggeredBy.username%
-        """.trimIndent())
+        """.trimIndent()
     }
 }
 ```
@@ -57,12 +60,12 @@ The compiled plugin ZIP can be downloaded from the [Releases][releases] tab.
 ## Notes
 
 * You can specify role [session tags][session-tags] using the optional
-  parameters of the form `param("awsrole.sessionTags", "projectId=%teamcity.project.id%")`.
+  parameters of the form `sessionTags = "projectId=%teamcity.project.id%"`.
   As per the linked AWS docs, this requires the assumed role's trust policy to
   allow `sts:TagSession`.
   
 * Both the default role session name and external ID naming schemes can be
-  overridden using parameters `awsrole.sessionName` and `awsrole.externalId`
+  overridden using parameters `sessionName` and `externalId`
   respectively. 
 
 * An IAM role session name has a maximum length of 64 characters. TeamCity project

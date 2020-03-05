@@ -15,6 +15,15 @@
          <outputDirectory>agent</outputDirectory>
      </file> 
   </files>
+  <fileSets>
+    <fileSet>
+      <directory>../kotlin-dsl/</directory>
+      <outputDirectory>kotlin-dsl</outputDirectory>
+      <includes>
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+  </fileSets>
   <moduleSets>
     <moduleSet>
        <useAllReactorProjects>true</useAllReactorProjects>
@@ -26,11 +35,14 @@
            <outputDirectory>server</outputDirectory>
            <unpack>false</unpack>
            <dependencySets>
-               <dependencySet>
-                    <includes>
-                         <include>*</include>
-                    </includes>
-               </dependencySet>
+             <dependencySet>
+               <includes>
+                 <include>*</include>
+               </includes>
+               <excludes>
+                 <exclude>org.slf4j:*</exclude>
+               </excludes>
+             </dependencySet>
            </dependencySets>
        </binaries>
     </moduleSet>

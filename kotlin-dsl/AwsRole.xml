@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dsl-extension kind="buildFeature" type="awsrole" generateDslJar="true">
+    <class name="AwsAssumeRole">
+        <description>
+            A build feature for assuming an AWS role to be used during the build
+        </description>
+    </class>
+    <function name="awsAssumeRole">
+        <description>
+            Assumes an AWS role for use during the build
+        </description>
+    </function>
+    <params>
+        <param name="awsrole.roleArn" dslName="roleArn">
+            <description>AWS ARN of the role to assume</description>
+        </param>
+        <param name="awsrole.externalId" dslName="externalId">
+            <description>The external ID used when requesting the role session</description>
+        </param>
+        <param name="awsrole.sessionName" dslName="sessionName">
+            <description>The session name used when requesting the role session</description>
+        </param>
+        <param name="awsrole.sessionTags" dslName="sessionTags">
+            <description>Tags applied to the assumed session</description>
+        </param>
+    </params>
+</dsl-extension>
