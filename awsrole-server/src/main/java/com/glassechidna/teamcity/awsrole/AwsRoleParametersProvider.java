@@ -16,4 +16,9 @@ public class AwsRoleParametersProvider {
     public String getSessionName() {
         return AwsRoleConstants.SESSION_NAME_PARAMETER;
     }
+
+    public String getSessionDuration() {
+        return AwsRoleConstants.SESSION_DURATION_PARAMETER;
+    }
+
 }

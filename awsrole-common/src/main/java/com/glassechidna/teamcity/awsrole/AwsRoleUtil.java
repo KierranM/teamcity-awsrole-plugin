@@ -23,6 +23,15 @@ public class AwsRoleUtil {
         return params.getOrDefault(AwsRoleConstants.EXTERNAL_ID_PARAMETER, "");
     }
 
+    public static Integer getSessionDuration(Map<String, String> params) {
+        String strDuration = params.get(AwsRoleConstants.SESSION_DURATION_PARAMETER);
+        Integer duration = AwsRoleConstants.DEFAULT_SESSION_DURATION_SECONDS;
+        if (strDuration != null) {
+            duration = Integer.parseInt(strDuration);
+        }
+        return duration;
+    }
+
     public static String getSessionName(Map<String, String> params) {
         String sessionName = params.getOrDefault(AwsRoleConstants.SESSION_NAME_PARAMETER, "");
 
