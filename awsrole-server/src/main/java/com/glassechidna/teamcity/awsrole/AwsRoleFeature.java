@@ -50,6 +50,11 @@ public class AwsRoleFeature extends BuildFeature {
                 invalid.add(new InvalidProperty(AwsRoleConstants.ROLE_ARN_PARAMETER,  "AWS Role ARN is required"));
             }
 
+            Integer sessionDuration = AwsRoleUtil.getSessionDuration(params);
+            if (sessionDuration < AwsRoleConstants.MINIMUM_SESSION_DURATION_SECONDS || sessionDuration > AwsRoleConstants.MAXIMUM_SESSION_DURATION_SECONDS) {
+                invalid.add(new InvalidProperty(AwsRoleConstants.SESSION_DURATION_PARAMETER, "AWS Role session duration must be within the valid durations for this role"));
+            }
+
             return invalid;
         };
     }
@@ -61,6 +66,8 @@ public class AwsRoleFeature extends BuildFeature {
         builder.append(String.format("Role ARN: %s\n", AwsRoleUtil.getRoleArn(params)));
         builder.append(String.format("External Id: %s\n", AwsRoleUtil.getExternalId(params)));
         builder.append(String.format("Session Name: %s\n", AwsRoleUtil.getSessionName(params)));
+        builder.append(String.format("Duration: %s seconds\n", AwsRoleUtil.getSessionDuration(params)));
+
 
         List<Tag> tags = AwsRoleUtil.getSessionTags(params);
 
@@ -80,6 +87,7 @@ public class AwsRoleFeature extends BuildFeature {
         Map<String, String> defaults = new HashMap<>();
         defaults.put(AwsRoleConstants.EXTERNAL_ID_PARAMETER, AwsRoleConstants.DEFAULT_EXTERNAL_ID);
         defaults.put(AwsRoleConstants.SESSION_NAME_PARAMETER, AwsRoleConstants.DEFAULT_SESSION_NAME);
+        defaults.put(AwsRoleConstants.SESSION_DURATION_PARAMETER, AwsRoleConstants.DEFAULT_SESSION_DURATION_SECONDS.toString());
         return defaults;
     }
 

@@ -20,6 +20,9 @@
         <param name="awsrole.sessionName" dslName="sessionName">
             <description>The session name used when requesting the role session</description>
         </param>
+        <param name="awsrole.sessionDuration" dslName="sessionDuration">
+            <description>The duration of the assume role session in seconds</description>
+        </param>
         <param name="awsrole.sessionTags" dslName="sessionTags">
             <description>Tags applied to the assumed session</description>
         </param>

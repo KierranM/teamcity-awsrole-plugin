@@ -58,12 +58,14 @@ public class Injector implements ParametersPreprocessor {
             String roleArn = AwsRoleUtil.getRoleArn(resolved);
             String externalId = AwsRoleUtil.getExternalId(resolved);
             String sessionName = AwsRoleUtil.getSessionName(resolved);
+            Integer sessionDuration = AwsRoleUtil.getSessionDuration(resolved);
 
             List<Tag> tags = AwsRoleUtil.getSessionTags(resolved);
 
             AssumeRoleRequest request = AssumeRoleRequest.builder()
                     .roleArn(roleArn)
                     .roleSessionName(sessionName)
+                    .durationSeconds(sessionDuration)
                     .externalId(externalId)
                     .tags(tags)
                     .build();
