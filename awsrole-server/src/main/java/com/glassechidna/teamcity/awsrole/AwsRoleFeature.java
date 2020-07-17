@@ -64,6 +64,7 @@ public class AwsRoleFeature extends BuildFeature {
     public String describeParameters(@NotNull Map<String, String> params) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("Role ARN: %s\n", AwsRoleUtil.getRoleArn(params)));
+        builder.append(String.format("IAM Access Key Id: %s\n", AwsRoleUtil.getIamAccessKeyId(params)));
         builder.append(String.format("External Id: %s\n", AwsRoleUtil.getExternalId(params)));
         builder.append(String.format("Session Name: %s\n", AwsRoleUtil.getSessionName(params)));
         builder.append(String.format("Duration: %s seconds\n", AwsRoleUtil.getSessionDuration(params)));

@@ -23,6 +23,14 @@ public class AwsRoleUtil {
         return params.getOrDefault(AwsRoleConstants.EXTERNAL_ID_PARAMETER, "");
     }
 
+    public static String getIamAccessKeyId(Map<String, String> params) {
+        return params.getOrDefault(AwsRoleConstants.ACCESS_KEY_ID_PARAMETER, "");
+    }
+
+    public static String getIamSecretKey(Map<String, String> params) {
+        return params.getOrDefault(AwsRoleConstants.SECRET_ACCESS_KEY_PARAMETER, "");
+    }
+
     public static Integer getSessionDuration(Map<String, String> params) {
         String strDuration = params.get(AwsRoleConstants.SESSION_DURATION_PARAMETER);
         Integer duration = AwsRoleConstants.DEFAULT_SESSION_DURATION_SECONDS;

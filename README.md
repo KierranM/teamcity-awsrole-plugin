@@ -18,6 +18,8 @@ effort or granting permissions that are too powerful.
 
 ## The solution
 
+![Screenshot](screenshot.png)
+
 The TeamCity **server** should have an IAM role that has `sts:AssumeRole` permissions
 to assume roles needed by build steps. Build configurations add a build feature 
 configured like so:
@@ -37,6 +39,9 @@ features {
     }
 }
 ```
+
+Optionally, a AWS IAM user with `sts:AssumeRole` permissions can be specified in the
+build feature parameters instead of using the server credentials.
 
 Whenever a build with this feature  is started, the **server** assumes the 
 requested role and sets `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and 

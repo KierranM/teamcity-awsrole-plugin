@@ -23,6 +23,24 @@
 </tr>
 <tr>
     <th>
+        <label for="${params.iamAccessKeyId}"> IAM Access Key ID:</label>
+    </th>
+    <td>
+        <props:textProperty name="${params.iamAccessKeyId}" className="longField"/>
+        <span class="smallNote">Optional; if not specified credentials to assume the role will come from the server in the standard search order</span>
+    </td>
+</tr>
+<tr>
+    <th>
+        <label for="${params.iamAccessKeyId}"> IAM Secret Access Key:</label>
+    </th>
+    <td>
+        <props:passwordProperty name="${params.iamSecretKey}" className="longField"/>
+        <span class="smallNote">Optional; if not specified credentials to assume the role will come from the server in the standard search order</span>
+    </td>
+</tr>
+<tr>
+    <th>
         <label for="${params.externalId}">External ID:</label>
     </th>
     <td>

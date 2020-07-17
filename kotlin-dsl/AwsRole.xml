@@ -14,6 +14,12 @@
         <param name="awsrole.roleArn" dslName="roleArn">
             <description>AWS ARN of the role to assume</description>
         </param>
+        <param name="awsrole.iamAccessKeyId" dslName="iamAccessKeyId">
+            <description>Optional; IAM Access Key ID to assume role with.  If not specified credentials to assume the role will come from the server in the standard search order</description>
+        </param>
+        <param name="secure:awsrole.iamSecretKey" dslName="iamSecretKey">
+            <description>Optional; IAM Secret Access Key to assume role with.  If not specified credentials to assume the role will come from the server in the standard search order</description>
+        </param>
         <param name="awsrole.externalId" dslName="externalId">
             <description>The external ID used when requesting the role session</description>
         </param>
