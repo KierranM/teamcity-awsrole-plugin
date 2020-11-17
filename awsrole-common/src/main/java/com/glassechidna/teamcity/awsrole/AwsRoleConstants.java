@@ -6,6 +6,8 @@ public class AwsRoleConstants {
 
     public static final String PARAMETER_PREFIX = "awsrole.";
     public static final String ROLE_ARN_PARAMETER = PARAMETER_PREFIX + "roleArn";
+    public static final String ACCESS_KEY_ID_PARAMETER = PARAMETER_PREFIX + "iamAccessKeyId";
+    public static final String SECRET_ACCESS_KEY_PARAMETER = PARAMETER_PREFIX + "iamSecretKey";
     public static final String LEGACY_ROLE_ARN_PARAMETER = "teamcityAwsRolePluginRoleArn";
     public static final String SESSION_DURATION_PARAMETER = PARAMETER_PREFIX + "sessionDuration";
     public static final String SESSION_TAGS_PARAMETER = PARAMETER_PREFIX + "sessionTags";
